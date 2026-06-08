@@ -1,0 +1,185 @@
+╔══════════════════════════════════════════════════════════════════╗
+║         CAREER INTEL v7 — VERCEL ONLY SETUP                     ║
+║         Railway is gone. Everything runs on Vercel.             ║
+╚══════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ WHAT CHANGED IN v7
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✓ Railway completely removed — not needed anymore
+  ✓ No more vercel.json Railway URL to edit
+  ✓ API runs as Vercel Serverless Functions (free, auto-scaling)
+  ✓ Landing page with Guest mode (no account needed)
+  ✓ Guest mode: all data stays in your browser
+  ✓ Full-time Jobs tab
+  ✓ Internships, Startups, Grad Programs tabs
+  ✓ USAJobs.gov (built-in, no key needed)
+  ✓ JSearch + Adzuna (optional, just add keys in Vercel)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ FILES TO REPLACE IN YOUR GITHUB REPO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+REPLACE these files (copy from this download):
+  api/_shared.js               ← NEW
+  api/health.js                ← NEW (replaces server.js)
+  api/parse.js                 ← NEW (replaces server.js)
+  api/opportunities.js         ← NEW (replaces server.js)
+  api/message.js               ← NEW (replaces server.js)
+  package.json                 ← REPLACE
+  vercel.json                  ← REPLACE (no Railway URL needed)
+  vite.config.js               ← REPLACE
+  src/App.jsx                  ← REPLACE (new landing + guest mode)
+  src/lib/api.js               ← REPLACE
+
+DELETE these files from your repo (no longer needed):
+  api/server.js                ← DELETE THIS
+  railway.json                 ← DELETE THIS
+  HOW-TO-UPDATE.txt            ← can delete
+  SETUP-GUIDE.html             ← can delete
+
+DO NOT TOUCH (keep exactly as-is):
+  src/index.css
+  src/main.jsx
+  src/lib/store.js
+  src/pages/DocumentsPage.jsx
+  src/pages/OpportunitiesPage.jsx
+  src/pages/TrackerPage.jsx
+  src/components/DetailPanel.jsx
+  index.html
+  .gitignore
+  supabase-schema.sql (keep for later)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1 — PUSH TO GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+After copying all files above into your career-intel folder:
+
+  cd path/to/career-intel
+
+  # Delete old files no longer needed
+  git rm api/server.js
+  git rm railway.json
+
+  # Stage everything
+  git add .
+
+  # Commit and push
+  git commit -m "v7: vercel serverless, no railway, guest mode"
+  git push
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 2 — ADD YOUR OPENAI KEY IN VERCEL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+THIS IS THE ONLY KEY YOU MUST SET. Everything else is optional.
+
+  1. Go to vercel.com → your project
+  2. Click "Settings" tab
+  3. Click "Environment Variables" in the left menu
+  4. Click "Add New"
+  5. Name:  OPENAI_API_KEY
+     Value: sk-proj-xxxxxxxxxxxxxxx  (your full OpenAI key)
+  6. Make sure all three checkboxes are checked:
+       ✓ Production
+       ✓ Preview  
+       ✓ Development
+  7. Click "Save"
+  8. Go to "Deployments" tab → click the three dots on latest → "Redeploy"
+     (environment variables only take effect after a redeploy)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 3 — OPTIONAL: ADD FREE JOB LISTING KEYS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Same place: Vercel → Settings → Environment Variables
+
+ADZUNA (completely free, no monthly limit):
+  Name:  ADZUNA_APP_ID
+  Value: [your id]
+  
+  Name:  ADZUNA_APP_KEY
+  Value: [your key]
+  
+  How to get: developer.adzuna.com → Register → Dashboard → API Access Details
+
+JSEARCH (200 free searches/month):
+  Name:  JSEARCH_KEY
+  Value: [your key]
+  
+  How to get: rapidapi.com → search "JSearch" → subscribe free plan
+              → Endpoints tab → copy the x-rapidapi-key value
+
+After adding any new variable → redeploy (Deployments → three dots → Redeploy)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 4 — VERIFY EVERYTHING WORKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+A. Check your API is alive:
+   Open: https://your-app.vercel.app/api/health
+   
+   You should see:
+   {
+     "status": "ok",
+     "version": "v7-vercel",
+     "platform": "Vercel Serverless",
+     "openai": "✓ configured",
+     ...
+   }
+
+B. Use the app:
+   Open: https://your-app.vercel.app
+   → You see the landing page with "Continue as Guest" and "Sign in"
+   → Click "Continue as Guest"
+   → Click "Documents" → upload your resume
+   → Profile appears → go to "Opportunities" → click "Refresh"
+   → Results appear in ~20-30 seconds
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ COMPLETE STATUS: DONE vs LEFT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DONE AFTER THIS UPDATE:
+  ✓ Entire app runs on Vercel — no Railway needed
+  ✓ No files to manually edit (no URL placeholders)
+  ✓ Landing page with Guest / Sign-in choice
+  ✓ Guest mode — full app, no account, data in browser
+  ✓ OpenAI powers all AI calls
+  ✓ Internships tab (10 per refresh)
+  ✓ Full-time Jobs tab (8 per refresh, H1B flagged)
+  ✓ Startups tab (6 per refresh, outreach tips)
+  ✓ Grad Programs tab (6 per refresh, STEM OPT flagged)
+  ✓ USAJobs.gov — federal jobs, open to OPT (no key needed)
+  ✓ Adzuna integration ready (add key to activate)
+  ✓ JSearch integration ready (add key to activate)
+  ✓ AI outreach message generator
+  ✓ Application tracker
+  ✓ Search + filters across all results
+  ✓ Everything saves in browser between sessions (guest mode)
+
+OPTIONAL / LEFT TO DO:
+  ○ Add Adzuna key → real job listings from 3M+ postings
+  ○ Add JSearch key → real LinkedIn/Indeed/Google Jobs listings
+  ○ Supabase setup → saves history, enables real Sign-in accounts
+    (supabase-schema.sql is included and ready to use)
+  ○ Weekly email digest (needs Resend.com — future feature)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ HOW THE NEW ARCHITECTURE WORKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before (broken):  Browser → Vercel → Railway → OpenAI
+After (working):  Browser → Vercel → OpenAI
+
+Vercel Serverless Functions (/api/*.js files):
+  /api/health        → GET  → returns server status
+  /api/parse         → POST → reads uploaded PDFs, returns profile JSON
+  /api/opportunities → POST → calls OpenAI + job APIs, returns opportunities
+  /api/message       → POST → calls OpenAI, returns outreach message
+
+These run automatically. No server to manage. No monthly hosting cost.
+Vercel's free tier gives you 100,000 function invocations per month.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -11,10 +11,12 @@ export function useStore() {
     visaFriendly: true, remote: false, minProb: 0,
     location: "both", jobTypes: ["internship", "fulltime"],
   });
+  const [aiModel,  setAiModelRaw]  = useState(() => ls("ci_model") || "gpt-4o-mini");
 
   const setProfile = useCallback((p) => { setProfileRaw(p); lsSet("ci_profile", p); }, []);
   const setOpps    = useCallback((o) => { setOppsRaw(o);    lsSet("ci_opps", o); }, []);
   const setFilters = useCallback((f) => { setFiltersRaw(f); lsSet("ci_filters", f); }, []);
+  const setAiModel = useCallback((m) => { setAiModelRaw(m); lsSet("ci_model", m); }, []);
 
   const toggleSave = useCallback((id, data) => {
     setSavedRaw(prev => {
@@ -35,9 +37,9 @@ export function useStore() {
 
   const reset = useCallback(() => {
     ["ci_profile","ci_opps","ci_saved","ci_filters"].forEach(k => localStorage.removeItem(k));
-    setProfileRaw(null); setOppsRaw(null); setSavedRaw({}); 
+    setProfileRaw(null); setOppsRaw(null); setSavedRaw({});
     setFiltersRaw({ visaFriendly: true, remote: false, minProb: 0, location: "both", jobTypes: ["internship","fulltime"] });
   }, []);
 
-  return { profile, setProfile, opps, setOpps, saved, toggleSave, setStatus, filters, setFilters, reset };
+  return { profile, setProfile, opps, setOpps, saved, toggleSave, setStatus, filters, setFilters, aiModel, setAiModel, reset };
 }

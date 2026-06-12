@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Upload, FileText, X, CheckCircle } from "lucide-react";
 import { api } from "../lib/api.js";
 
-export default function DocumentsPage({ profile, onDone }) {
+export default function DocumentsPage({ profile, onDone, aiModel = "gpt-4o-mini" }) {
   const [queued,  setQueued]  = useState([]);
   const [parsing, setParsing] = useState(false);
   const [drag,    setDrag]    = useState(false);
@@ -18,7 +18,7 @@ export default function DocumentsPage({ profile, onDone }) {
     if (!queued.length) return;
     setParsing(true); setErr("");
     try {
-      const { profile } = await api.parse(queued);
+      const { profile } = await api.parse(queued, aiModel);
       onDone(profile);
       setQueued([]);
     } catch (e) {

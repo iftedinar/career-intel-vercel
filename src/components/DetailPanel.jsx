@@ -14,7 +14,7 @@ function Row({ label, value, accent }) {
   );
 }
 
-export default function DetailPanel({ item, type, profile, saved, onSave, onClose }) {
+export default function DetailPanel({ item, type, profile, saved, onSave, onClose, aiModel = "gpt-4o-mini" }) {
   const [msgType, setMsgType] = useState("");
   const [msg, setMsg] = useState("");
   const [genning, setGenning] = useState(false);
@@ -28,7 +28,7 @@ export default function DetailPanel({ item, type, profile, saved, onSave, onClos
   async function genMsg(t) {
     setMsgType(t); setMsg(""); setGenning(true);
     try {
-      const r = await api.message(profile, item, t);
+      const r = await api.message(profile, item, t, aiModel);
       setMsg(r.message);
     } catch { setMsg("Could not generate — check API connection."); }
     finally { setGenning(false); }

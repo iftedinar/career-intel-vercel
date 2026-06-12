@@ -29,11 +29,12 @@ export default async function handler(req, res) {
   try {
     // Parse multipart form
     const form = formidable({ maxFileSize: 10 * 1024 * 1024, multiples: true });
-    const [, files] = await new Promise((resolve, reject) => {
+    const [fields, files] = await new Promise((resolve, reject) => {
       form.parse(req, (err, fields, files) => {
         if (err) reject(err); else resolve([fields, files]);
       });
     });
+    const model = Array.isArray(fields.model) ? fields.model[0] : (fields.model || "gpt-4o-mini");
 
     const uploaded = Object.values(files).flat();
     const docs = uploaded
@@ -50,54 +51,56 @@ export default async function handler(req, res) {
     }
 
     const raw = await ai(
-      "You are a resume parser. Return valid JSON only. No markdown fences, no text outside the JSON object.",
-      `Extract a complete career profile from these documents:
+      "You are a resume parser. Return valid JSON only. No markdown fences, no text outside the JSON object. CRITICAL: Extract ONLY information that is explicitly present in the uploaded documents. Do NOT invent, guess, or use example values. If a field is not in the documents, use null.",
+      `Extract a career profile from these documents. Use ONLY what is literally written in the text below — do not fill in any field from memory or imagination.
 
+DOCUMENTS:
 ${docs.map(d => `=== ${d.name} ===\n${d.content}`).join("\n\n")}
 
-Return this exact JSON structure (fill with real values from the documents):
+Return this exact JSON structure. Replace every placeholder with the real value from the documents above, or null if not found:
 {
-  "name": "Full Name",
-  "email": "email@domain.com",
-  "phone": "number if present",
-  "location": "City, State",
-  "linkedin": "linkedin url if present",
-  "portfolio": "portfolio url if present",
-  "university": "University Name",
-  "graduation": "Month Year",
-  "gpa": 3.78,
-  "majors": ["Major 1", "Major 2"],
+  "name": null,
+  "email": null,
+  "phone": null,
+  "location": null,
+  "linkedin": null,
+  "portfolio": null,
+  "university": null,
+  "graduation": null,
+  "gpa": null,
+  "majors": [],
   "minors": [],
-  "visa_status": "international_student",
-  "work_auth": "CPT eligible",
+  "visa_status": null,
+  "work_auth": null,
   "skills": {
-    "technical": ["Python", "SQL"],
-    "tools": ["Power BI", "Tableau", "Excel"],
-    "platforms": ["Workday", "Oracle", "PeopleSoft"],
-    "soft": ["Leadership", "Communication"]
+    "technical": [],
+    "tools": [],
+    "platforms": [],
+    "soft": []
   },
   "experience": [
     {
-      "title": "Job Title",
-      "company": "Company Name",
-      "location": "City, ST",
-      "start": "Jun 2025",
-      "end": "Aug 2025",
-      "type": "internship",
-      "highlights": ["Key achievement 1", "Key achievement 2"]
+      "title": null,
+      "company": null,
+      "location": null,
+      "start": null,
+      "end": null,
+      "type": null,
+      "highlights": []
     }
   ],
   "certifications": [
-    { "name": "Cert Name", "issuer": "LinkedIn Learning", "date": "Nov 2025" }
+    { "name": null, "issuer": null, "date": null }
   ],
-  "education_details": { "honors": "Dean's List", "clubs": ["Club 1"] },
-  "interests": ["fintech", "data analytics"],
-  "strengths": ["Rare ERP experience at undergrad level", "Dual major Finance + Data Analytics"],
-  "target_roles": ["Data Analyst", "Finance Analyst", "Business Intelligence Analyst"],
-  "target_locations": ["Springfield MO", "Kansas City", "Remote"],
-  "summary": "Two-sentence professional summary of this specific candidate."
+  "education_details": { "honors": null, "clubs": [] },
+  "interests": [],
+  "strengths": [],
+  "target_roles": [],
+  "target_locations": [],
+  "summary": null
 }`,
-      2500
+      2500,
+      model
     );
 
     const profile = extractJSON(raw);

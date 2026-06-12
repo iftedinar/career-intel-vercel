@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   try {
-    const { profile, filters = {} } = req.body;
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
+    const { profile, filters = {}, model = "gpt-4o-mini" } = body;
     if (!profile) return res.status(400).json({ error: "Profile is required." });
 
     const today = new Date().toISOString().split("T")[0];
@@ -179,13 +180,14 @@ Return ONE JSON object (no markdown, no text outside JSON):
 }
 
 REQUIREMENTS:
-- 10 internships, 8 full-time jobs, 6 startups, 6 grad programs
+- 6 internships, 5 full-time jobs, 4 startups, 4 grad programs
 - Order each section by probability / fit_score highest first
 ${visaFriendly ? "- ONLY roles open to F-1/CPT/OPT. Skip anything requiring US citizenship, green card, or security clearance." : ""}
 ${remote ? "- Prefer remote and hybrid positions." : ""}
 - For jobs from the real listings above, use their exact apply_url and set source to their source value
 - Use real company names and real URLs throughout`,
-      6000
+      4000,
+      model
     );
 
     const opportunities = extractJSON(raw);

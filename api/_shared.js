@@ -1,39 +1,90 @@
 /**
- * Shared utilities for all Vercel API functions.
- * Imported by parse.js, opportunities.js, message.js
+ * Shared AI utilities for all Vercel API functions.
+ * Supports OpenAI (GPT-4o, GPT-4o-mini) and Anthropic (Claude Haiku, Claude Sonnet).
+ * Auto-falls back to the other provider if the primary fails or is unconfigured.
  */
-import OpenAI from "openai";
+import OpenAI    from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-// ── OpenAI client (created once, reused across warm invocations) ────────────
-const OPENAI_KEY = (process.env.OPENAI_API_KEY || "").trim();
+// ── API clients ─────────────────────────────────────────────────────────────
+const OPENAI_KEY    = (process.env.OPENAI_API_KEY    || "").trim();
+const ANTHROPIC_KEY = (process.env.ANTHROPIC_API_KEY || "").trim();
 
-if (!OPENAI_KEY.startsWith("sk-")) {
-  console.error("OPENAI_API_KEY missing or invalid — add it in Vercel → Settings → Environment Variables");
+const openaiClient    = OPENAI_KEY.startsWith("sk-")       ? new OpenAI({ apiKey: OPENAI_KEY })        : null;
+const anthropicClient = ANTHROPIC_KEY.startsWith("sk-ant") ? new Anthropic({ apiKey: ANTHROPIC_KEY })  : null;
+
+if (!openaiClient && !anthropicClient) {
+  console.error("No AI provider configured — add OPENAI_API_KEY or ANTHROPIC_API_KEY in Vercel Settings → Environment Variables");
 }
 
-export const openai = OPENAI_KEY.startsWith("sk-")
-  ? new OpenAI({ apiKey: OPENAI_KEY })
-  : null;
+// ── Model ID map ─────────────────────────────────────────────────────────────
+const MODEL_IDS = {
+  "gpt-4o-mini":    "gpt-4o-mini",
+  "gpt-4o":         "gpt-4o",
+  "claude-haiku":   "claude-haiku-4-5-20251001",
+  "claude-sonnet":  "claude-sonnet-4-6",
+};
 
-// ── AI call wrapper ──────────────────────────────────────────────────────────
-export async function ai(systemPrompt, userPrompt, maxTokens = 4000) {
-  if (!openai) {
-    throw new Error(
-      "OpenAI API key not configured. Go to Vercel → your project → Settings → Environment Variables → add OPENAI_API_KEY"
-    );
-  }
-  const res = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+function isClaudeModel(model) {
+  return model && (model.startsWith("claude") || model === "claude-haiku" || model === "claude-sonnet");
+}
+
+// ── Provider calls ────────────────────────────────────────────────────────────
+async function callOpenAI(modelKey, system, user, maxTokens) {
+  if (!openaiClient) throw new Error("OpenAI API key not configured (OPENAI_API_KEY)");
+  const res = await openaiClient.chat.completions.create({
+    model: MODEL_IDS[modelKey] || "gpt-4o-mini",
     max_tokens: maxTokens,
     messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user",   content: userPrompt },
+      { role: "system", content: system },
+      { role: "user",   content: user   },
     ],
   });
   return res.choices[0]?.message?.content || "";
 }
 
-// ── JSON extractor ───────────────────────────────────────────────────────────
+async function callAnthropic(modelKey, system, user, maxTokens) {
+  if (!anthropicClient) throw new Error("Anthropic API key not configured (ANTHROPIC_API_KEY)");
+  const res = await anthropicClient.messages.create({
+    model: MODEL_IDS[modelKey] || "claude-haiku-4-5-20251001",
+    max_tokens: maxTokens,
+    system,
+    messages: [{ role: "user", content: user }],
+  });
+  return res.content[0]?.text || "";
+}
+
+// ── Main AI call with auto-fallback ──────────────────────────────────────────
+export async function ai(system, user, maxTokens = 4000, model = "gpt-4o-mini") {
+  const useAnthropic = isClaudeModel(model);
+
+  // Primary attempt
+  try {
+    if (useAnthropic) {
+      return await callAnthropic(model, system, user, maxTokens);
+    } else {
+      return await callOpenAI(model, system, user, maxTokens);
+    }
+  } catch (primaryErr) {
+    console.warn(`[ai] ${model} failed: ${primaryErr.message} — trying fallback`);
+  }
+
+  // Fallback to the other provider
+  try {
+    if (useAnthropic) {
+      return await callOpenAI("gpt-4o-mini", system, user, maxTokens);
+    } else {
+      return await callAnthropic("claude-haiku", system, user, maxTokens);
+    }
+  } catch (fallbackErr) {
+    throw new Error(
+      `Both AI providers failed. ` +
+      `Make sure at least one of OPENAI_API_KEY or ANTHROPIC_API_KEY is set in Vercel → Settings → Environment Variables.`
+    );
+  }
+}
+
+// ── JSON extractor ────────────────────────────────────────────────────────────
 export function extractJSON(text) {
   const clean = text.replace(/```json\s*/gi, "").replace(/```\s*/gi, "").trim();
   const start = clean.search(/[{[]/);
@@ -41,17 +92,16 @@ export function extractJSON(text) {
   try { return JSON.parse(clean.slice(start)); } catch { return null; }
 }
 
-// ── CORS headers ─────────────────────────────────────────────────────────────
+// ── CORS headers ──────────────────────────────────────────────────────────────
 export function setCors(res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin",  "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
 // ── Real job APIs ─────────────────────────────────────────────────────────────
-
-const JSEARCH_KEY = (process.env.JSEARCH_KEY || "").trim();
-const ADZUNA_ID   = (process.env.ADZUNA_APP_ID || "").trim();
+const JSEARCH_KEY = (process.env.JSEARCH_KEY    || "").trim();
+const ADZUNA_ID   = (process.env.ADZUNA_APP_ID  || "").trim();
 const ADZUNA_KEY  = (process.env.ADZUNA_APP_KEY || "").trim();
 
 export async function fetchJSearch(query, type = "intern") {

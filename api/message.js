@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
 
   try {
-    const { profile, target, type } = req.body;
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {});
+    const { profile, target, type, model = "gpt-4o-mini" } = body;
 
     const raw = await ai(
       "You write outreach messages for students. Return only the message text — no subject line, no JSON, nothing before or after the message.",
@@ -32,7 +33,8 @@ Rules:
 4. End with a single clear ask
 5. Do NOT open with "I hope this finds you well", "My name is", or any cliché
 6. Write as a real student, not marketing copy`,
-      400
+      400,
+      model
     );
 
     res.json({ message: raw.trim() });

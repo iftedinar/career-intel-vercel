@@ -54,7 +54,7 @@ const TABS = [
   { id:"grad",         label:"Grad programs",  key:"grad_programs"},
 ];
 
-export default function OpportunitiesPage({ profile, opps, onRefresh, saved, onSave, filters, setFilters }) {
+export default function OpportunitiesPage({ profile, opps, onRefresh, saved, onSave, filters, setFilters, aiModel = "gpt-4o-mini" }) {
   const [loading,  setLoading]  = useState(false);
   const [tab,      setTab]      = useState("internships");
   const [selected, setSelected] = useState(null);
@@ -66,7 +66,7 @@ export default function OpportunitiesPage({ profile, opps, onRefresh, saved, onS
     if (!profile) { setErr("Upload your resume first."); return; }
     setLoading(true); setErr("");
     try {
-      const { opportunities } = await api.opportunities(profile, filters);
+      const { opportunities } = await api.opportunities(profile, filters, aiModel);
       onRefresh(opportunities);
     } catch (e) { setErr(e.message); }
     finally { setLoading(false); }
@@ -218,7 +218,7 @@ export default function OpportunitiesPage({ profile, opps, onRefresh, saved, onS
 
       {selected && (
         <DetailPanel item={selected.item} type={selected.type}
-          profile={profile} saved={saved} onSave={onSave} onClose={()=>setSelected(null)}/>
+          profile={profile} saved={saved} onSave={onSave} onClose={()=>setSelected(null)} aiModel={aiModel}/>
       )}
     </div>
   );

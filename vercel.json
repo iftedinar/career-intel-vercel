@@ -1,5 +1,10 @@
 {
   "buildCommand": "npm install && npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/opportunities.js": { "maxDuration": 60 },
+    "api/parse.js":         { "maxDuration": 30 },
+    "api/message.js":       { "maxDuration": 30 }
+  }
 }

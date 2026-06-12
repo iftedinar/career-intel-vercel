@@ -1,15 +1,10 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { Target, FileText, Bookmark, Zap, UserCheck, User, Sun, Moon, Settings } from "lucide-react";
-=======
-import { Target, FileText, Bookmark, Zap, UserCheck, User, Sun, Moon } from "lucide-react";
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
 import { useStore } from "./lib/store.js";
 import DocumentsPage     from "./pages/DocumentsPage.jsx";
 import OpportunitiesPage from "./pages/OpportunitiesPage.jsx";
 import TrackerPage       from "./pages/TrackerPage.jsx";
 
-<<<<<<< HEAD
 // ─── Model options ────────────────────────────────────────────────────────────
 const MODELS = [
   { value: "gpt-4o-mini",   label: "GPT-4o mini",   provider: "OpenAI",    note: "Fast" },
@@ -19,24 +14,17 @@ const MODELS = [
 ];
 
 // ─── Landing page ─────────────────────────────────────────────────────────────
-=======
-// ─── Landing / mode selector ─────────────────────────────────────────────────
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
 function LandingPage({ onGuest, onSignIn, theme, onToggleTheme }) {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center",
       justifyContent: "center", background: "var(--bg)", padding: "2rem",
     }}>
-<<<<<<< HEAD
       {/* Theme toggle */}
-=======
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
       <button
         onClick={onToggleTheme}
         title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
         style={{
-<<<<<<< HEAD
           position: "fixed", top: "1.25rem", right: "1.25rem",
           background: "var(--bg2)", border: "1px solid var(--b2)",
           borderRadius: "var(--r)", padding: ".5rem .65rem",
@@ -50,17 +38,6 @@ function LandingPage({ onGuest, onSignIn, theme, onToggleTheme }) {
       </button>
 
       <div style={{ width: "100%", maxWidth: 440 }}>
-=======
-          position: "fixed", top: "1rem", right: "1rem",
-          background: "var(--bg2)", border: "1px solid var(--b2)",
-          borderRadius: "var(--r)", padding: ".45rem .6rem",
-          cursor: "pointer", color: "var(--tx2)", display: "flex", alignItems: "center",
-        }}
-      >
-        {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-      </button>
-      <div style={{ width: "100%", maxWidth: 420 }}>
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: "2.25rem" }}>
           <div className="logo-ico" style={{ width: 44, height: 44, borderRadius: 12, fontSize: 20 }}>
@@ -146,7 +123,6 @@ const NAV = [
 
 // ─── App shell ────────────────────────────────────────────────────────────────
 export default function App() {
-<<<<<<< HEAD
   const [mode, setMode]   = useState(null);
   const [page, setPage]   = useState("documents");
   const [theme, setTheme] = useState(() => localStorage.getItem("ci_theme") || "dark");
@@ -160,24 +136,13 @@ export default function App() {
     reset,
   } = useStore();
 
-  // Apply theme
-=======
-  const [mode, setMode] = useState(null); // null = landing, "guest" or "user"
-  const [page, setPage] = useState("documents");
-  const [theme, setTheme] = useState(() => localStorage.getItem("ci_theme") || "dark");
-  const { profile, setProfile, opps, setOpps, saved, toggleSave, setStatus, filters, setFilters, reset } = useStore();
-
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("ci_theme", theme);
   }, [theme]);
 
   function toggleTheme() { setTheme(t => t === "dark" ? "light" : "dark"); }
-<<<<<<< HEAD
-=======
 
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
   function handleProfile(p) { setProfile(p); setPage("opportunities"); }
   function handleSignIn() {
     alert("Account sign-in coming soon. Continuing as guest for now.");

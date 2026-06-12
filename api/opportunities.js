@@ -5,6 +5,8 @@
  */
 import { ai, extractJSON, setCors, fetchJSearch, fetchAdzuna, fetchUSAJobs } from "./_shared.js";
 
+export const config = { maxDuration: 60 };
+
 export default async function handler(req, res) {
   setCors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -186,8 +188,12 @@ ${visaFriendly ? "- ONLY roles open to F-1/CPT/OPT. Skip anything requiring US c
 ${remote ? "- Prefer remote and hybrid positions." : ""}
 - For jobs from the real listings above, use their exact apply_url and set source to their source value
 - Use real company names and real URLs throughout`,
+<<<<<<< HEAD
       4000,
       model
+=======
+      4000
+>>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
     );
 
     const opportunities = extractJSON(raw);

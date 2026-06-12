@@ -1,56 +1,21 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
-import { Target, FileText, Bookmark, Zap, UserCheck, User, Sun, Moon, Settings } from "lucide-react";
-=======
 import { Target, FileText, Bookmark, Zap, UserCheck, User, Sun, Moon } from "lucide-react";
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
 import { useStore } from "./lib/store.js";
 import DocumentsPage     from "./pages/DocumentsPage.jsx";
 import OpportunitiesPage from "./pages/OpportunitiesPage.jsx";
 import TrackerPage       from "./pages/TrackerPage.jsx";
 
-<<<<<<< HEAD
-// ─── Model options ────────────────────────────────────────────────────────────
-const MODELS = [
-  { value: "gpt-4o-mini",   label: "GPT-4o mini",   provider: "OpenAI",    note: "Fast" },
-  { value: "gpt-4o",        label: "GPT-4o",         provider: "OpenAI",    note: "Powerful" },
-  { value: "claude-haiku",  label: "Claude Haiku",   provider: "Anthropic", note: "Fast" },
-  { value: "claude-sonnet", label: "Claude Sonnet",  provider: "Anthropic", note: "Best" },
-];
-
-// ─── Landing page ─────────────────────────────────────────────────────────────
-=======
 // ─── Landing / mode selector ─────────────────────────────────────────────────
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
 function LandingPage({ onGuest, onSignIn, theme, onToggleTheme }) {
   return (
     <div style={{
       minHeight: "100vh", display: "flex", alignItems: "center",
       justifyContent: "center", background: "var(--bg)", padding: "2rem",
     }}>
-<<<<<<< HEAD
-      {/* Theme toggle */}
-=======
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
       <button
         onClick={onToggleTheme}
         title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
         style={{
-<<<<<<< HEAD
-          position: "fixed", top: "1.25rem", right: "1.25rem",
-          background: "var(--bg2)", border: "1px solid var(--b2)",
-          borderRadius: "var(--r)", padding: ".5rem .65rem",
-          cursor: "pointer", color: "var(--tx2)",
-          display: "flex", alignItems: "center", gap: 6,
-          fontSize: ".75rem", transition: "all var(--t)",
-        }}
-      >
-        {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
-        {theme === "dark" ? "Light" : "Dark"}
-      </button>
-
-      <div style={{ width: "100%", maxWidth: 440 }}>
-=======
           position: "fixed", top: "1rem", right: "1rem",
           background: "var(--bg2)", border: "1px solid var(--b2)",
           borderRadius: "var(--r)", padding: ".45rem .6rem",
@@ -60,7 +25,6 @@ function LandingPage({ onGuest, onSignIn, theme, onToggleTheme }) {
         {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
       </button>
       <div style={{ width: "100%", maxWidth: 420 }}>
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
         {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: "2.25rem" }}>
           <div className="logo-ico" style={{ width: 44, height: 44, borderRadius: 12, fontSize: 20 }}>
@@ -146,38 +110,18 @@ const NAV = [
 
 // ─── App shell ────────────────────────────────────────────────────────────────
 export default function App() {
-<<<<<<< HEAD
-  const [mode, setMode]   = useState(null);
-  const [page, setPage]   = useState("documents");
-  const [theme, setTheme] = useState(() => localStorage.getItem("ci_theme") || "dark");
-  const [showModelPicker, setShowModelPicker] = useState(false);
-
-  const {
-    profile, setProfile, opps, setOpps,
-    saved, toggleSave, setStatus,
-    filters, setFilters,
-    aiModel, setAiModel,
-    reset,
-  } = useStore();
-
-  // Apply theme
-=======
   const [mode, setMode] = useState(null); // null = landing, "guest" or "user"
   const [page, setPage] = useState("documents");
   const [theme, setTheme] = useState(() => localStorage.getItem("ci_theme") || "dark");
   const { profile, setProfile, opps, setOpps, saved, toggleSave, setStatus, filters, setFilters, reset } = useStore();
 
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("ci_theme", theme);
   }, [theme]);
 
   function toggleTheme() { setTheme(t => t === "dark" ? "light" : "dark"); }
-<<<<<<< HEAD
-=======
 
->>>>>>> 1d7f11b605d54153abdd08df7eef45636174a3ed
   function handleProfile(p) { setProfile(p); setPage("opportunities"); }
   function handleSignIn() {
     alert("Account sign-in coming soon. Continuing as guest for now.");
@@ -194,8 +138,6 @@ export default function App() {
   const savedCount = Object.keys(saved).length;
   const oppCount   = (opps?.internships?.length || 0) + (opps?.fulltime_jobs?.length || 0) +
                      (opps?.startups?.length || 0)    + (opps?.grad_programs?.length || 0);
-
-  const currentModel = MODELS.find(m => m.value === aiModel) || MODELS[0];
 
   return (
     <div className="shell">
@@ -226,43 +168,6 @@ export default function App() {
 
         {/* Bottom section */}
         <div className="side-bot">
-          {/* AI Model picker */}
-          <div style={{ marginBottom: ".75rem" }}>
-            <div style={{
-              fontSize: ".65rem", color: "var(--tx3)",
-              textTransform: "uppercase", letterSpacing: ".06em",
-              marginBottom: 5, display: "flex", justifyContent: "space-between", alignItems: "center",
-            }}>
-              <span>AI Model</span>
-              <span style={{ color: currentModel.provider === "Anthropic" ? "var(--blue)" : "var(--green)", fontWeight: 500 }}>
-                {currentModel.provider}
-              </span>
-            </div>
-            <select
-              value={aiModel}
-              onChange={e => setAiModel(e.target.value)}
-              style={{
-                width: "100%", fontSize: ".76rem",
-                padding: ".38rem .55rem", borderRadius: "var(--r)",
-              }}
-            >
-              <optgroup label="OpenAI">
-                <option value="gpt-4o-mini">GPT-4o mini — fast</option>
-                <option value="gpt-4o">GPT-4o — powerful</option>
-              </optgroup>
-              <optgroup label="Anthropic">
-                <option value="claude-haiku">Claude Haiku — fast</option>
-                <option value="claude-sonnet">Claude Sonnet — best quality</option>
-              </optgroup>
-            </select>
-            <div style={{ fontSize: ".67rem", color: "var(--tx3)", marginTop: 4, lineHeight: 1.4 }}>
-              Auto-fallback enabled — if the primary fails, the other provider is tried automatically.
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div style={{ height: 1, background: "var(--b)", marginBottom: ".75rem" }} />
-
           {/* User row */}
           <div className="user-row">
             <div className="ava">{initials}</div>
@@ -274,13 +179,6 @@ export default function App() {
                 {profile ? profile.university || "Profile loaded" : "Upload resume to start"}
               </div>
             </div>
-            <button
-              className="btn ghost ico xs"
-              onClick={toggleTheme}
-              title={theme === "dark" ? "Light mode" : "Dark mode"}
-            >
-              {theme === "dark" ? <Sun size={12} /> : <Moon size={12} />}
-            </button>
             <button
               className="btn ghost xs"
               onClick={toggleTheme}
@@ -307,24 +205,6 @@ export default function App() {
             <div className="pbar-strip">
               <div style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--green)", flexShrink: 0 }} />
               <strong style={{ color: "var(--tx)" }}>{profile.name}</strong>
-              {profile.university && (
-                <>
-                  <span style={{ color: "var(--b3)" }}>·</span>
-                  <span style={{ fontSize: ".8rem", color: "var(--tx2)" }}>{profile.university}</span>
-                </>
-              )}
-              {profile.gpa && (
-                <>
-                  <span style={{ color: "var(--b3)" }}>·</span>
-                  <span style={{ fontFamily: "var(--mono)", color: "var(--amber)", fontSize: ".8rem" }}>GPA {profile.gpa}</span>
-                </>
-              )}
-              {profile.visa_status && (
-                <>
-                  <span style={{ color: "var(--b3)" }}>·</span>
-                  <span style={{ color: "var(--tx3)", fontSize: ".74rem" }}>{profile.visa_status}</span>
-                </>
-              )}
               <button className="btn ghost xs" style={{ marginLeft: "auto" }} onClick={() => setPage("documents")}>
                 Update docs
               </button>
@@ -332,8 +212,8 @@ export default function App() {
           </div>
         )}
 
-        {page === "documents"     && <DocumentsPage    profile={profile} onDone={handleProfile} aiModel={aiModel} />}
-        {page === "opportunities" && <OpportunitiesPage profile={profile} opps={opps} onRefresh={setOpps} saved={saved} onSave={toggleSave} filters={filters} setFilters={setFilters} aiModel={aiModel} />}
+        {page === "documents"     && <DocumentsPage    profile={profile} onDone={handleProfile} />}
+        {page === "opportunities" && <OpportunitiesPage profile={profile} opps={opps} onRefresh={setOpps} saved={saved} onSave={toggleSave} filters={filters} setFilters={setFilters} />}
         {page === "tracker"       && <TrackerPage       saved={saved} setStatus={setStatus} onRemove={id => toggleSave(id, saved[id])} />}
       </main>
     </div>
